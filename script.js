@@ -4,14 +4,14 @@
 // === 1. Gemini AI 聊天配置 (請替換金鑰!) ===
 // ==========================================================
 
-const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; // 🚨 請替換為您的金鑰 🚨
+const GEMINI_API_KEY = "AIzaSyD6WKpM3URfbzlnXG9IXep5Ey2b1WPgLo0"; // 🚨 請替換為您的金鑰 🚨
 const API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + GEMINI_API_KEY;
 
 // 獲取 DOM 元素
 const chatInput = document.getElementById('chatInput');
 const sendMessageBtn = document.getElementById('sendMessage');
 const chatMessages = document.getElementById('chatMessages');
-const themeToggle = document.getElementById('theme-toggle'); // 關鍵修正：確保這裡成功抓取到按鈕
+const themeToggle = document.getElementById('theme-toggle'); 
 
 const SYSTEM_INSTRUCTION = `
     你是一個溫暖、善解人意的心靈療癒師，名叫 Mika。
@@ -61,7 +61,6 @@ function appendMessage(text, type) {
 }
 
 async function sendChatMessage() {
-    // 省略了 API 請求和錯誤處理代碼，請參考上一次回復的完整邏輯
     const userText = chatInput.value.trim();
     if (userText === '') return;
 
@@ -116,7 +115,7 @@ async function sendChatMessage() {
 
 
 // ==========================================================
-// === 2. 占卜結果資料庫與邏輯 (保持不變) ===
+// === 2. 占卜結果資料庫與邏輯 ===
 // ==========================================================
 
 let selectedZodiac = '';        
@@ -172,7 +171,7 @@ function handleCardFlip(card, index) {
     if (!cardFlipped) {
         const randomIndex = Math.floor(Math.random() * allTarotCards.length);
         selectedTarotCard = allTarotCards[randomIndex].name;
-        cardFlipped = true; 
+        cardFlipped = true; // 設置已翻牌標誌
         
         tarotCards.forEach((otherCard, i) => {
             if (i !== index) {
