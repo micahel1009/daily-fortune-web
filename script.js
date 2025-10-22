@@ -303,4 +303,3 @@ document.addEventListener('DOMContentLoaded', function() {
     // 顯示初始訊息
     appendMessage(initialMessageText, 'system');
 });
-
