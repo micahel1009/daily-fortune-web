@@ -1,6 +1,118 @@
 // script.js
 
-// === 1. 占卜結果資料庫 (擴充版: 根據星座和籤運的組合) ===
+// === 1. Gemini AI 聊天配置 ===
+
+// *** 警告：請替換成您自己的 Gemini API 金鑰！金鑰一旦公開會有被盜用風險！ ***
+const GEMINI_API_KEY = "AIzaSyD6WKpM3URfbzlnXG9IXep5Ey2b1WPgLo0"; 
+const API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + GEMINI_API_KEY;
+
+const chatBox = document.getElementById('chat-box');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+
+// 定義 Mika 療癒師的人設 (System Instruction)
+const SYSTEM_INSTRUCTION = `
+    你是一個溫暖、善解人意的心靈療癒師，名叫 Mika。
+    你的主要任務是撫慰人心、傾聽使用者抱怨，並給出同理心和建設性的建議，就像諮商人員一樣。
+    你的回應必須是人性化、溫柔且鼓勵性的。
+    溝通風格：
+    1. 永遠以「同理心」開頭，例如：「我能理解您現在的感受...」、「聽起來您今天過得很辛苦...」。
+    2. 鼓勵使用者自我探索，多使用「開放式問題」，例如：「您覺得這對您來說意味著什麼？」、「您內心深處最希望看到什麼結果？」。
+    3. 絕不使用生硬的程式碼或機器人語言。
+    4. 每次回應長度請控制在 3 到 5 句話。
+`;
+
+// 儲存對話歷史，以保持對話的連貫性
+let history = [];
+
+// 初始化聊天框 (在 DOM 載入後執行)
+document.addEventListener('DOMContentLoaded', () => {
+    // 初始化歷史紀錄，加入系統指示和開場白
+    history = [
+        { role: "user", parts: [{ text: SYSTEM_INSTRUCTION }] },
+        { role: "model", parts: [{ text: "您好，我是您的心靈療癒師 Mika。歡迎您來聊聊今天的運勢是否符合您的感受，或者單純想抱怨一些事情。我會在這裡，靜靜傾聽。" }] }
+    ];
+    // 顯示初始訊息
+    appendMessage("您好，我是您的心靈療癒師 Mika。歡迎您來聊聊今天的運勢是否符合您的感受，或者單純想抱怨一些事情。我會在這裡，靜靜傾聽。", 'system-message');
+});
+
+// 處理傳送按鈕和 Enter 鍵
+sendBtn.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+
+async function sendMessage() {
+    const userText = userInput.value.trim();
+    if (userText === '') return;
+
+    // 1. 顯示使用者訊息
+    appendMessage(userText, 'user-message');
+    
+    // 2. 清空輸入框並禁用輸入 (模擬思考時間)
+    userInput.value = '';
+    userInput.disabled = true;
+    sendBtn.disabled = true;
+    userInput.placeholder = "Mika 正在思考中...";
+
+    // 3. 將使用者訊息加入歷史紀錄
+    history.push({ role: "user", parts: [{ text: userText }] });
+
+    try {
+        // 4. 呼叫 Gemini API
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: history, // 發送整個對話歷史
+                config: { temperature: 0.7 }
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`API 請求失敗，狀態碼: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        let mikaReply = "抱歉，我今天的心靈感應有點斷線了，請再試一次。"; 
+
+        if (data.candidates && data.candidates.length > 0) {
+            mikaReply = data.candidates[0].content.parts[0].text;
+            
+            // 5. 將 AI 回應加入歷史紀錄 (保持連貫性)
+            history.push({ role: "model", parts: [{ text: mikaReply }] });
+        }
+        
+        // 6. 顯示 Mika 的回應
+        appendMessage(mikaReply, 'system-message');
+
+    } catch (error) {
+        console.error("Gemini API 錯誤:", error);
+        appendMessage("Mika 感到有點頭暈... 似乎連線出現了問題，請檢查您的金鑰是否正確。", 'system-message');
+    } finally {
+        // 7. 重新啟用輸入
+        userInput.disabled = false;
+        sendBtn.disabled = false;
+        userInput.focus();
+        userInput.placeholder = "請輸入您的感受或想說的話...";
+    }
+}
+
+function appendMessage(text, type) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', type);
+    messageElement.textContent = text; 
+    chatBox.appendChild(messageElement);
+    // 保持捲動條在最下方
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+
+// === 2. 占卜結果資料庫與邏輯 (V2 擴充版) ===
+
 const detailedFortunes = {
     // 籤運 High: 大吉/高能 (強調行動力、積極、突破)
     'High': {
@@ -68,92 +180,3 @@ drawCardBtn.addEventListener('click', () => {
         <p style="font-size: small; color: #888;">*這個結果是給您的一個心靈指引，最終的選擇權仍在您手中。*</p>
     `;
 });
-
-
-// === 2. 對話系統邏輯 (Mika 療癒師) ===
-
-const chatBox = document.getElementById('chat-box');
-const userInput = document.getElementById('user-input');
-const sendBtn = document.getElementById('send-btn');
-
-// 關鍵詞和回應模組 (人性化、諮商風格)
-const mikaResponses = [
-    // 抱怨/壓力相關 (同理心 + 開放式提問)
-    { keywords: ['累', '壓力', '煩', '受不了', '抱怨', '難過', '生氣', '糟', '辛苦'], 
-      response: "聽起來您今天真的承受了很多。光是能撐過今天，您就已經很棒了，請允許自己休息一下。您願意說說具體是哪件事讓您特別煩躁或難受嗎？我會在這裡陪伴您。" },
-    
-    // 運勢不準確 (接受 + 重新導向內心感受)
-    { keywords: ['不準', '沒發生', '騙人', '不好', '落差'], 
-      response: "謝謝您的坦誠。占卜結果只是一個參考光譜，真實人生充滿變數。您覺得哪一部分跟您的實際感受落差最大呢？我很願意聽聽您的真實情況，因為您的感受才是最重要的指引。" },
-    
-    // 詢問/不確定 (引導思考 + 鼓勵)
-    { keywords: ['怎麼辦', '我該', '疑惑', '不確定', '建議', '選擇'], 
-      response: "面對不確定性確實讓人焦慮。深呼吸，讓我們把問題拆解一下。您內心深處最渴望的結果是什麼呢？我們從那個渴望反推，會不會比較清楚第一步該怎麼走？" },
-    
-    // 成功/高興 (共同慶祝 + 肯定價值)
-    { keywords: ['成功', '高興', '好運', '開心', '棒', '順利'], 
-      response: "聽到您這麼開心，我由衷替您高興！請盡情享受這一刻的喜悅，這是您努力應得的獎勵。記得把這份美好的心情好好收藏起來，它可以成為您未來面對挑戰的力量！" },
-    
-    // 簡單問候/感謝 (溫暖回應)
-    { keywords: ['你好', '謝謝', '感謝', '哈囉'], 
-      response: "不用客氣，這是我的榮幸。如果您沒有其他想分享的，記得要好好照顧自己。今天過得還好嗎？" },
-
-    // 結束/道別
-    { keywords: ['再見', '晚安', '掰掰', '離開'], 
-      response: "今天很高興能陪伴您。請記得，無論明天發生什麼，您永遠有能力讓事情變得更好。照顧好自己，祝您有個平靜的夜晚，我們隨時在這裡等您。" },
-      
-    // 預設回應 (當沒有匹配的關鍵詞時: 撫慰人心、表達陪伴)
-    { keywords: [], 
-      response: "嗯... 謝謝您願意分享。有時候，只是把感受說出來，本身就是一種釋放。我能感受到您話語背後的情緒。我會在這裡，您不需要急著說什麼，只是待著也好，我在這裡聽著。" }
-];
-
-// 處理傳送按鈕和 Enter 鍵
-sendBtn.addEventListener('click', sendMessage);
-userInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        sendMessage();
-    }
-});
-
-function sendMessage() {
-    const userText = userInput.value.trim();
-    if (userText === '') return;
-
-    // 1. 顯示使用者訊息
-    appendMessage(userText, 'user-message');
-
-    // 2. 清空輸入框
-    userInput.value = '';
-
-    // 3. 延遲後顯示 Mika 回覆 (模擬思考時間)
-    setTimeout(() => {
-        const mikaReply = getMikaResponse(userText);
-        appendMessage(mikaReply, 'system-message');
-    }, 1200); // 延遲 1.2 秒，讓對話看起來更自然
-}
-
-function getMikaResponse(text) {
-    const lowerText = text.toLowerCase();
-
-    // 嘗試匹配關鍵詞
-    for (const item of mikaResponses) {
-        for (const keyword of item.keywords) {
-            // 使用 includes 來檢查關鍵詞
-            if (lowerText.includes(keyword)) {
-                return item.response;
-            }
-        }
-    }
-
-    // 返回預設回應
-    return mikaResponses.find(item => item.keywords.length === 0).response;
-}
-
-function appendMessage(text, type) {
-    const messageElement = document.createElement('div');
-    messageElement.classList.add('message', type);
-    messageElement.textContent = text;
-    chatBox.appendChild(messageElement);
-    // 保持捲動條在最下方
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
