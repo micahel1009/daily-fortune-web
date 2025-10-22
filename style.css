@@ -1,0 +1,136 @@
+body {
+    font-family: '微軟正黑體', 'Arial', sans-serif;
+    background-color: #f4f7f6; /* 輕柔的背景色 */
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #5b5b8d; /* 療癒的紫色調 */
+    border-bottom: 2px solid #e0e0f0;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+/* 占卜區塊樣式 */
+.tarot-section {
+    padding: 20px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    background: #fafafa;
+}
+
+.input-group select {
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+#draw-card-btn {
+    padding: 10px 15px;
+    background-color: #79a6dc; /* 藍色按鈕 */
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#draw-card-btn:hover {
+    background-color: #5b87c7;
+}
+
+.result-box {
+    margin-top: 20px;
+    padding: 15px;
+    border: 2px dashed #a8a8e0;
+    border-radius: 8px;
+    min-height: 80px;
+    background: #f0f0ff; /* 淺紫色背景 */
+}
+
+/* 對話框區塊樣式 */
+.chat-section {
+    padding-top: 20px;
+    border-top: 1px dashed #dcdcdc;
+}
+
+h2 {
+    color: #8d5b8d; /* 紫紅色調 */
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.chat-box {
+    height: 300px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    overflow-y: auto; /* 允許捲動 */
+    margin-bottom: 10px;
+    background: #ffffff;
+    display: flex; /* 確保訊息排列 */
+    flex-direction: column;
+}
+
+.message {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 15px;
+    max-width: 75%;
+    font-size: 0.95em;
+}
+
+.system-message {
+    background-color: #e6f7ff; /* 系統淺藍 */
+    align-self: flex-start;
+    margin-right: auto;
+    border-bottom-left-radius: 5px; /* 增加對話氣泡感 */
+}
+
+.user-message {
+    background-color: #d1ffd1; /* 使用者淺綠 */
+    margin-left: auto;
+    align-self: flex-end;
+    border-bottom-right-radius: 5px; /* 增加對話氣泡感 */
+    text-align: left;
+}
+
+.chat-input-group {
+    display: flex;
+}
+
+#user-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+    font-size: 1em;
+}
+
+#send-btn {
+    background-color: #4CAF50; /* 綠色按鈕 */
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 15px;
+    border-radius: 0 5px 5px 0;
+    font-size: 1em;
+}
+
+#send-btn:hover {
+    background-color: #45a049;
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日心靈占卜與慰藉 - Mika 療癒室</title>
+    <link rel="stylesheet" href="style.css"> </head>
+<body>
+    <div class="container">
+        <h1>🌙 每日心靈療癒室 🌟</h1>
+
+        <div class="tarot-section">
+            <div class="input-group">
+                <label for="zodiac">請選擇您的星座:</label>
+                <select id="zodiac">
+                    <option value="">-- 請選擇 --</option>
+                    <option value="Aries">牡羊座 (3/21-4/19)</option>
+                    <option value="Taurus">金牛座 (4/20-5/20)</option>
+                    <option value="Gemini">雙子座 (5/21-6/20)</option>
+                    <option value="Cancer">巨蟹座 (6/21-7/22)</option>
+                    <option value="Leo">獅子座 (7/23-8/22)</option>
+                    <option value="Virgo">處女座 (8/23-9/22)</option>
+                    <option value="Libra">天秤座 (9/23-10/22)</option>
+                    <option value="Scorpio">天蠍座 (10/23-11/21)</option>
+                    <option value="Sagittarius">射手座 (11/22-12/21)</option>
+                    <option value="Capricorn">魔羯座 (12/22-1/19)</option>
+                    <option value="Aquarius">水瓶座 (1/20-2/18)</option>
+                    <option value="Pisces">雙魚座 (2/19-3/20)</option>
+                </select>
+            </div>
+
+            <button id="draw-card-btn">點此抽籤，開啟今日指引</button>
+            <div id="result-display" class="result-box">
+                <p>💡 抽籤後，您的今日指引將顯示於此。</p>
+            </div>
+        </div>
+
+        <div class="chat-section">
+            <h2>☕ 療癒師 Mika 專屬對話框 💖</h2>
+            <div id="chat-box" class="chat-box">
+                <div class="message system-message">
+                    您好，我是您的心靈療癒師 Mika。歡迎您來聊聊今天的運勢是否符合您的感受，或者單純想抱怨一些事情。我會在這裡，靜靜傾聽。
+                </div>
+            </div>
+            <div class="chat-input-group">
+                <input type="text" id="user-input" placeholder="請輸入您的感受或想說的話...">
+                <button id="send-btn">傳送</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script> </body>
+</html>
