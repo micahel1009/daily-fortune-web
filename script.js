@@ -315,3 +315,4 @@ document.addEventListener('DOMContentLoaded', function() {
 // 必須定義在全域，因為 HTML 的 onclick 屬性會呼叫它們
 // function handleCardFlip(card, index) { ... } (已定義在上方)
 // function generateFortune() { ... } (已定義在上方)
+
