@@ -11,7 +11,7 @@ const API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-
 const chatInput = document.getElementById('chatInput');
 const sendMessageBtn = document.getElementById('sendMessage');
 const chatMessages = document.getElementById('chatMessages');
-const themeToggle = document.getElementById('theme-toggle'); // 確保正確獲取主題切換按鈕
+const themeToggle = document.getElementById('theme-toggle'); 
 
 const SYSTEM_INSTRUCTION = `
     你是一個溫暖、善解人意的心靈療癒師，名叫 Mika。
