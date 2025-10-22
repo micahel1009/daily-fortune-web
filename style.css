@@ -1,136 +1,87 @@
-body {
-    font-family: '微軟正黑體', 'Arial', sans-serif;
-    background-color: #f4f7f6; /* 輕柔的背景色 */
-    color: #333;
-    line-height: 1.6;
-    padding: 20px;
+/* 字體定義 */
+body { 
+    font-family: 'Noto Sans TC', sans-serif; 
+}
+.hero-title { 
+    font-family: 'Playfair Display', serif; 
 }
 
-.container {
-    max-width: 900px;
-    margin: 0 auto;
-    background: #fff;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+/* 背景星空效果 (star-bg) */
+.star-bg {
+    background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 226, 0.2) 0%, transparent 50%);
 }
 
-h1 {
-    text-align: center;
-    color: #5b5b8d; /* 療癒的紫色調 */
-    border-bottom: 2px solid #e0e0f0;
-    padding-bottom: 10px;
-    margin-bottom: 30px;
+/* 卡片陰影效果 */
+.card-glow {
+    box-shadow: 0 0 40px rgba(120, 119, 198, 0.15);
 }
 
-/* 占卜區塊樣式 */
-.tarot-section {
-    padding: 20px;
-    border: 1px solid #dcdcdc;
-    border-radius: 10px;
-    margin-bottom: 30px;
-    background: #fafafa;
+/* 星座卡片互動效果 */
+.zodiac-card {
+    transition: all 0.3s;
+}
+.zodiac-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
-.input-group select {
-    padding: 10px 15px;
-    border-radius: 5px;
-    margin-right: 10px;
+/* 塔羅牌翻轉效果 */
+.tarot-card {
+    perspective: 1000px;
+}
+.tarot-flip {
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+}
+.tarot-flip.flipped {
+    transform: rotateY(180deg);
+}
+.tarot-front, .tarot-back {
+    backface-visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.tarot-back {
+    transform: rotateY(180deg);
 }
 
-#draw-card-btn {
-    padding: 10px 15px;
-    background-color: #79a6dc; /* 藍色按鈕 */
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+/* 月亮漂浮動畫 */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+.floating {
+    animation: float 3s ease-in-out infinite;
 }
 
-#draw-card-btn:hover {
-    background-color: #5b87c7;
+/* 聊天氣泡樣式 */
+.message-bubble { 
+    border-radius: 18px 18px 18px 4px; 
+    text-align: left;
 }
-
-.result-box {
-    margin-top: 20px;
-    padding: 15px;
-    border: 2px dashed #a8a8e0;
-    border-radius: 8px;
-    min-height: 80px;
-    background: #f0f0ff; /* 淺紫色背景 */
-}
-
-/* 對話框區塊樣式 */
-.chat-section {
-    padding-top: 20px;
-    border-top: 1px dashed #dcdcdc;
-}
-
-h2 {
-    color: #8d5b8d; /* 紫紅色調 */
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-.chat-box {
-    height: 300px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 15px;
-    overflow-y: auto; /* 允許捲動 */
-    margin-bottom: 10px;
-    background: #ffffff;
-    display: flex; /* 確保訊息排列 */
-    flex-direction: column;
-}
-
-.message {
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    border-radius: 15px;
-    max-width: 75%;
-    font-size: 0.95em;
-}
-
-.system-message {
-    background-color: #e6f7ff; /* 系統淺藍 */
-    align-self: flex-start;
-    margin-right: auto;
-    border-bottom-left-radius: 5px; /* 增加對話氣泡感 */
-}
-
-.user-message {
-    background-color: #d1ffd1; /* 使用者淺綠 */
-    margin-left: auto;
-    align-self: flex-end;
-    border-bottom-right-radius: 5px; /* 增加對話氣泡感 */
+.user-bubble { 
+    border-radius: 18px 18px 4px 18px; 
     text-align: left;
 }
 
-.chat-input-group {
-    display: flex;
+/* 捲軸美化 */
+* {  
+    scrollbar-width: thin;  
+    scrollbar-color: #bfc5ce transparent;
 }
-
-#user-input {
-    flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px 0 0 5px;
-    font-size: 1em;
+*::-webkit-scrollbar {  
+    width: 6px;
 }
-
-#send-btn {
-    background-color: #4CAF50; /* 綠色按鈕 */
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding: 10px 15px;
-    border-radius: 0 5px 5px 0;
-    font-size: 1em;
+*::-webkit-scrollbar-thumb {  
+    background-color: #bfc5ce;  
+    border-radius: 9999px;
 }
-
-#send-btn:hover {
-    background-color: #45a049;
+*::-webkit-scrollbar-track {  
+    background-color: transparent;  
+    border-radius: 9999px;
 }
