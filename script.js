@@ -12,6 +12,8 @@ const chatInput = document.getElementById('chatInput');
 const sendMessageBtn = document.getElementById('sendMessage');
 const chatMessages = document.getElementById('chatMessages');
 const themeToggle = document.getElementById('theme-toggle'); 
+const themeIcon = document.getElementById('theme-icon');
+const body = document.body;
 
 const SYSTEM_INSTRUCTION = `
     你是一個溫暖、善解人意的心靈療癒師，名叫 Mika。
@@ -27,36 +29,18 @@ const SYSTEM_INSTRUCTION = `
 let history = []; // 用於儲存對話歷史
 
 function appendMessage(text, type) {
-    const container = document.createElement('div');
-    const avatar = document.createElement('div');
-    const bubble = document.createElement('div');
-    const content = document.createElement('p');
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', `${type}-message`);
+
+    const messageContent = document.createElement('div');
+    messageContent.classList.add('message-content');
     
     // 簡單移除 AI 可能產生的 Markdown 格式 (例如 **粗體**)
-    content.textContent = text.replace(/\*\*(.*?)\*\*/g, '$1'); 
+    messageContent.textContent = text.replace(/\*\*(.*?)\*\*/g, '$1'); 
 
-    if (type === 'user') {
-        container.className = 'flex items-start space-x-3 justify-end';
-        avatar.className = 'w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center';
-        avatar.innerHTML = '<i class="fas fa-user text-gray-600 dark:text-gray-300 text-sm"></i>';
-        bubble.className = 'user-bubble bg-indigo-600 text-white p-4 max-w-md';
-        
-        bubble.appendChild(content);
-        container.appendChild(bubble);
-        container.appendChild(avatar);
-    } else { // system/bot message
-        container.className = 'flex items-start space-x-3';
-        avatar.className = 'w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center';
-        avatar.innerHTML = '<i class="fas fa-heart text-white text-sm"></i>';
-        bubble.className = 'message-bubble bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 p-4 max-w-md';
-        content.className = 'text-gray-800 dark:text-gray-200';
-        
-        bubble.appendChild(content);
-        container.appendChild(avatar);
-        container.appendChild(bubble);
-    }
-
-    chatMessages.appendChild(container);
+    messageElement.appendChild(messageContent);
+    
+    chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
@@ -99,36 +83,36 @@ async function sendChatMessage() {
         }
         
         // 4. 顯示 Mika 的回應
-        appendMessage(mikaReply, 'system');
+        appendMessage(mikaReply, 'bot');
 
     } catch (error) {
         console.error("Gemini API Error:", error);
-        appendMessage("Mika 感到有點頭暈... 似乎連線出現了問題，請檢查您的金鑰和網路。", 'system');
+        appendMessage("Mika 感到有點頭暈... 似乎連線出現了問題，請檢查您的金鑰和網路。", 'bot');
     } finally {
         // 5. 重新啟用輸入
         chatInput.disabled = false;
         sendMessageBtn.disabled = false;
         chatInput.focus();
-        chatInput.placeholder = "分享你的感受或想法...";
+        chatInput.placeholder = "輸入你的訊息...";
     }
 }
 
 
 // ==========================================================
-// === 2. 占卜結果資料庫與邏輯 ===
+// === 3. 占卜結果資料庫與邏輯 ===
 // ==========================================================
 
-let selectedZodiac = '';        
-let selectedTarotCard = '';
+let selectedZodiac = null;        
+let selectedTarotCard = null;
 let cardFlipped = false; 
 
 const allTarotCards = [
-    { name: '太陽', icon: 'fas fa-sun', color: 'text-yellow-500' },
-    { name: '月亮', icon: 'fas fa-moon', color: 'text-blue-500' },
-    { name: '星星', icon: 'fas fa-star', color: 'text-purple-500' },
-    { name: '力量', icon: 'fas fa-shield-halved', color: 'text-orange-500' },
-    { name: '魔術師', icon: 'fas fa-wand-magic-sparkles', color: 'text-cyan-500' },
-    { name: '審判', icon: 'fas fa-gavel', color: 'text-red-500' }
+    { name: '太陽', icon: 'fas fa-sun', color: '#ffc107' },
+    { name: '月亮', icon: 'fas fa-moon', color: '#6a5acd' },
+    { name: '星星', icon: 'fas fa-star', color: '#9370db' },
+    { name: '力量', icon: 'fas fa-shield-halved', color: '#ff69b4' },
+    { name: '魔術師', icon: 'fas fa-wand-magic-sparkles', color: '#00bcd4' },
+    { name: '審判', icon: 'fas fa-gavel', color: '#dc3545' }
 ];
 
 const zodiacFortunes = {
@@ -155,42 +139,38 @@ const tarotMeanings = {
     '審判': { love: '是時候回顧並評估過去的感情。', career: '工作上將面臨重大考驗。', money: '適合清算舊債和重新審視財務狀況。', overall: '⚖️ 小凶 - 充滿挑戰但能成長的一天 💡' }
 };
 
-// 必須在全域定義，供 HTML 的 onclick 屬性呼叫
-function handleCardFlip(card, index) {
-    const flipDiv = card.querySelector('.tarot-flip');
+function handleCardFlip(card) {
     const tarotCards = document.querySelectorAll('.tarot-card');
-
-    if (cardFlipped && !flipDiv.classList.contains('flipped')) {
+    
+    // 檢查是否已翻牌
+    if (cardFlipped && !card.classList.contains('flipped')) {
         alert('今日運勢只抽取一張牌，請點擊生成運勢！');
         return;
     }
-    if (cardFlipped && flipDiv.classList.contains('flipped')) {
+    if (cardFlipped && card.classList.contains('flipped')) {
         return;
     }
 
     if (!cardFlipped) {
+        // 隨機選定一張牌作為結果
         const randomIndex = Math.floor(Math.random() * allTarotCards.length);
-        selectedTarotCard = allTarotCards[randomIndex].name;
-        cardFlipped = true; // 設置已翻牌標誌
+        const cardData = allTarotCards[randomIndex];
+        selectedTarotCard = cardData.name;
+        cardFlipped = true; 
         
-        tarotCards.forEach((otherCard, i) => {
-            if (i !== index) {
-                otherCard.style.opacity = '0.5';
-                otherCard.style.pointerEvents = 'none'; 
-            }
-            
-            if (i === index) {
-                flipDiv.classList.add('flipped');
-                const backDiv = otherCard.querySelector('.tarot-back');
-                const iconElement = backDiv.querySelector('i');
-                const textElement = backDiv.querySelector('p');
-                
-                iconElement.className = allTarotCards[randomIndex].icon + ' ' + allTarotCards[randomIndex].color + ' text-xl mb-1 fas';
-                textElement.textContent = selectedTarotCard;
-                
-                otherCard.style.opacity = '1'; 
+        // 禁用和灰化未選中的卡片
+        tarotCards.forEach(otherCard => {
+            if (otherCard !== card) {
+                otherCard.classList.add('disabled');
             }
         });
+        
+        // 翻轉卡片並顯示內容
+        card.classList.add('flipped');
+        
+        const cardBack = card.querySelector('.tarot-back');
+        cardBack.innerHTML = `<i class="${cardData.icon}" style="color: ${cardData.color}; font-size: 2em;"></i>
+                              <div class="tarot-name">${cardData.name}</div>`;
     }
 }
 
@@ -204,49 +184,18 @@ function generateFortune() {
         return;
     }
     
-    const zodiacName = zodiacFortunes[selectedZodiac].name;
-    const zodiacReading = zodiacFortunes[selectedZodiac];
-    const tarotReading = tarotMeanings[selectedTarotCard];
-    const resultDiv = document.getElementById('readingDetails');
+    const zodiacData = zodiacFortunes[selectedZodiac];
+    const tarotData = tarotMeanings[selectedTarotCard];
     
-    document.getElementById('selectedSignName').textContent = zodiacName;
-    document.getElementById('selectedTarotName').textContent = selectedTarotCard;
-    document.getElementById('fortuneOverallTitle').textContent = tarotReading.overall;
+    // 設置結果
+    document.getElementById('selectedSignName').textContent = `星座：${zodiacData.name}`;
+    document.getElementById('selectedTarotName').textContent = `塔羅牌：${selectedTarotCard}`;
+    document.getElementById('fortuneOverallTitle').textContent = tarotData.overall;
     
-    resultDiv.innerHTML = `
-        <div class="space-y-6">
-            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg">
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-heart text-red-500 mr-3"></i>
-                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white">愛情運勢</h4>
-                </div>
-                <p class="text-gray-700 dark:text-gray-300">${zodiacReading.love} ${tarotReading.love}</p>
-            </div>
-            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg">
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-briefcase text-blue-500 mr-3"></i>
-                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white">事業運勢</h4>
-                </div>
-                <p class="text-gray-700 dark:text-gray-300">${zodiacReading.career} ${tarotReading.career}</p>
-            </div>
-        </div>
-        <div class="space-y-6">
-            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg">
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-coins text-green-500 mr-3"></i>
-                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white">財運運勢</h4>
-                </div>
-                <p class="text-gray-700 dark:text-gray-300">${zodiacReading.money} ${tarotReading.money}</p>
-            </div>
-            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg">
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>
-                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white">整體建議</h4>
-                </div>
-                <p class="text-gray-700 dark:text-gray-300">${zodiacReading.advice} ${tarotReading.overall}</p>
-            </div>
-        </div>
-    `;
+    document.getElementById('loveResult').textContent = `${zodiacData.love} ${tarotData.love}`;
+    document.getElementById('careerResult').textContent = `${zodiacData.career} ${tarotData.career}`;
+    document.getElementById('wealthResult').textContent = `${zodiacData.money} ${tarotData.money}`;
+    document.getElementById('adviceResult').textContent = `${zodiacData.advice} ${tarotData.overall}`;
 
     document.getElementById('fortuneResult').classList.remove('hidden');
     document.getElementById('fortuneResult').scrollIntoView({ behavior: 'smooth' });
@@ -254,30 +203,53 @@ function generateFortune() {
 
 
 // ==========================================================
-// === 3. 初始化和事件監聽器 ===
+// === 4. 初始化和事件綁定 ===
 // ==========================================================
 
-document.addEventListener('DOMContentLoaded', function() {
-    const html = document.documentElement;
-    const zodiacCards = document.querySelectorAll('.zodiac-card');
-
+function setupEventListeners() {
     // --- 主題切換邏輯 ---
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        html.classList.add('dark');
-    } else {
-        html.classList.remove('dark');
+    function updateTheme(isDark) {
+        if (isDark) {
+            body.classList.add('dark-mode');
+            themeIcon.className = 'fas fa-moon';
+            localStorage.theme = 'dark';
+        } else {
+            body.classList.remove('dark-mode');
+            themeIcon.className = 'fas fa-sun';
+            localStorage.theme = 'light';
+        }
     }
-    themeToggle.addEventListener('click', function() {
-        html.classList.toggle('dark');
-        localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+    
+    // 載入時檢查主題
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const storedTheme = localStorage.theme;
+
+    if (storedTheme === 'dark' || (storedTheme !== 'light' && prefersDark)) {
+        updateTheme(true);
+    } else {
+        updateTheme(false);
+    }
+
+    // 按鈕點擊切換
+    themeToggle.addEventListener('click', () => {
+        const isCurrentlyDark = body.classList.contains('dark-mode');
+        updateTheme(!isCurrentlyDark);
     });
     
     // --- 占卜區塊事件 ---
+    const zodiacCards = document.querySelectorAll('.zodiac-card');
     zodiacCards.forEach(card => {
         card.addEventListener('click', function() {
-            zodiacCards.forEach(c => c.classList.remove('ring-4', 'ring-indigo-500'));
-            this.classList.add('ring-4', 'ring-indigo-500');
+            zodiacCards.forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
             selectedZodiac = this.dataset.sign;
+        });
+    });
+
+    const tarotCards = document.querySelectorAll('.tarot-card');
+    tarotCards.forEach(card => {
+        card.addEventListener('click', function() {
+            handleCardFlip(this); // 綁定到我們全域定義的函數
         });
     });
 
@@ -290,16 +262,16 @@ document.addEventListener('DOMContentLoaded', function() {
             sendChatMessage();
         }
     });
-
-    // 初始化 AI 聊天區塊 (顯示開場白)
-    const initialMessageText = "您好，我是您的心靈療癒師 Mika。歡迎您來聊聊今天的運勢是否符合您的感受，或者單純想抱怨一些事情。我會在這裡，靜靜傾聽。";
     
-    // 初始化歷史紀錄 (包含系統指示和開場白)
+    // 初始化聊天框中的訊息 (用 JS 寫入開場白)
+    const initialMessageText = "您好！我是您的心靈陪伴者 Mika。歡迎您來聊聊今天的運勢是否符合您的感受，或者單純想抱怨一些事情。我會在這裡，靜靜傾聽。";
+    appendMessage(initialMessageText, 'bot');
+    
+    // 初始化 AI 歷史紀錄
     history = [
         { role: "user", parts: [{ text: SYSTEM_INSTRUCTION }] },
         { role: "model", parts: [{ text: initialMessageText }] }
     ];
-    
-    // 顯示初始訊息
-    appendMessage(initialMessageText, 'system');
-});
+}
+
+document.addEventListener('DOMContentLoaded', setupEventListeners);
