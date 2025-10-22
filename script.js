@@ -4,7 +4,7 @@
 // === 1. Gemini AI 聊天配置 (請替換金鑰!) ===
 // ==========================================================
 
-const GEMINI_API_KEY = "AIzaSyD6WKpM3URfbzlnXG9IXep5Ey2b1WPgLo0"; // 🚨 請替換為您的金鑰 🚨
+const GEMINI_API_KEY = "AIzaSyD56YaFHrKww4qQpMbHWstZjJ9d8ODwENM"; // 🚨 請替換為您的金鑰 🚨
 const API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + GEMINI_API_KEY;
 
 // 獲取 DOM 元素
@@ -303,3 +303,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // 顯示初始訊息
     appendMessage(initialMessageText, 'system');
 });
+
