@@ -4,13 +4,14 @@
 // === 1. Gemini AI 聊天配置 (請替換金鑰!) ===
 // ==========================================================
 
-const GEMINI_API_KEY = "AIzaSyD6WKpM3URfbzlnXG9IXep5Ey2b1WPgLo0"; // 🚨 請替換為您的金鑰 🚨
+const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; // 🚨 請替換為您的金鑰 🚨
 const API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + GEMINI_API_KEY;
 
+// 獲取 DOM 元素
 const chatInput = document.getElementById('chatInput');
 const sendMessageBtn = document.getElementById('sendMessage');
 const chatMessages = document.getElementById('chatMessages');
-const themeToggle = document.getElementById('theme-toggle');
+const themeToggle = document.getElementById('theme-toggle'); // 關鍵修正：確保這裡成功抓取到按鈕
 
 const SYSTEM_INSTRUCTION = `
     你是一個溫暖、善解人意的心靈療癒師，名叫 Mika。
@@ -60,6 +61,7 @@ function appendMessage(text, type) {
 }
 
 async function sendChatMessage() {
+    // 省略了 API 請求和錯誤處理代碼，請參考上一次回復的完整邏輯
     const userText = chatInput.value.trim();
     if (userText === '') return;
 
@@ -90,7 +92,7 @@ async function sendChatMessage() {
         }
 
         const data = await response.json();
-        let mikaReply = "抱歉，Mika 的心靈連線今天有點不穩，請確認您的 API 金鑰是否正確，或稍後再試。";
+        let mikaReply = "抱歉，Mika 感到有點頭暈... 似乎連線出現了問題，請檢查您的金鑰和網路。";
 
         if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts) {
             mikaReply = data.candidates[0].content.parts[0].text;
@@ -114,12 +116,12 @@ async function sendChatMessage() {
 
 
 // ==========================================================
-// === 2. 占卜結果資料庫與邏輯 ===
+// === 2. 占卜結果資料庫與邏輯 (保持不變) ===
 // ==========================================================
 
 let selectedZodiac = '';        
 let selectedTarotCard = '';
-let cardFlipped = false; // 追蹤是否已經翻牌
+let cardFlipped = false; 
 
 const allTarotCards = [
     { name: '太陽', icon: 'fas fa-sun', color: 'text-yellow-500' },
@@ -130,7 +132,6 @@ const allTarotCards = [
     { name: '審判', icon: 'fas fa-gavel', color: 'text-red-500' }
 ];
 
-// 占卜數據 (使用星座代碼作為 key)
 const zodiacFortunes = {
     'Aries': { name: '牡羊座', love: '今日愛情能量強烈，單身者有機會遇到命中注定的人，有伴侶者感情更加甜蜜。', career: '工作上充滿活力，勇於表達想法將為你帶來意想不到的機會。', money: '財運平穩，適合進行小額投資，避免衝動消費。', advice: '保持積極樂觀的態度，你的熱情將感染身邊的人。' },
     'Taurus': { name: '金牛座', love: '感情穩定發展，耐心經營關係將獲得回報，避免過於固執。', career: '踏實努力的態度受到上司認可，堅持不懈將有所收穫。', money: '理財能力出色，適合長期投資規劃，財富穩步增長。', advice: '慢工出細活，用心經營的事物都會有好結果。' },
@@ -146,7 +147,6 @@ const zodiacFortunes = {
     'Pisces': { name: '雙魚座', love: '感性浪漫的一面特別迷人，用心感受愛情的美好。', career: '創意靈感豐富，藝術相關工作有突出表現。', money: '直覺投資可能有意外收穫，但要避免情緒化決策。', 'advice': '相信內心的感受，你的同理心和善良會為你帶來好運。' }
 };
 
-// 塔羅牌解讀 (整體運勢標題)
 const tarotMeanings = {
     '太陽': { love: '愛情充滿陽光和活力。', career: '事業前景光明。', money: '財運亨通。', overall: '✨ 大吉 - 豐盛且充滿動能的一天 ☀️' },
     '月亮': { love: '需要更多溝通理解。', career: '工作中可能有隱藏的挑戰。', money: '理財需要更加謹慎。', overall: '🚧 小凶 - 沉靜且充滿思考的一天 ☁️' },
@@ -156,34 +156,31 @@ const tarotMeanings = {
     '審判': { love: '是時候回顧並評估過去的感情。', career: '工作上將面臨重大考驗。', money: '適合清算舊債和重新審視財務狀況。', overall: '⚖️ 小凶 - 充滿挑戰但能成長的一天 💡' }
 };
 
+// 必須在全域定義，供 HTML 的 onclick 屬性呼叫
 function handleCardFlip(card, index) {
     const flipDiv = card.querySelector('.tarot-flip');
     const tarotCards = document.querySelectorAll('.tarot-card');
 
-    // 只能翻一張牌的邏輯
     if (cardFlipped && !flipDiv.classList.contains('flipped')) {
         alert('今日運勢只抽取一張牌，請點擊生成運勢！');
         return;
     }
     if (cardFlipped && flipDiv.classList.contains('flipped')) {
-        // 如果是點擊已經翻開的牌，不做任何事
         return;
     }
 
-    // 隨機選定一張牌作為結果
     if (!cardFlipped) {
         const randomIndex = Math.floor(Math.random() * allTarotCards.length);
         selectedTarotCard = allTarotCards[randomIndex].name;
-        cardFlipped = true; // 設置已翻牌標誌
+        cardFlipped = true; 
         
         tarotCards.forEach((otherCard, i) => {
             if (i !== index) {
                 otherCard.style.opacity = '0.5';
-                otherCard.style.pointerEvents = 'none'; // 禁用其他牌
+                otherCard.style.pointerEvents = 'none'; 
             }
             
             if (i === index) {
-                // 這是被選中的牌，翻轉並顯示結果
                 flipDiv.classList.add('flipped');
                 const backDiv = otherCard.querySelector('.tarot-back');
                 const iconElement = backDiv.querySelector('i');
@@ -192,7 +189,7 @@ function handleCardFlip(card, index) {
                 iconElement.className = allTarotCards[randomIndex].icon + ' text-xl mb-1 ' + allTarotCards[randomIndex].color;
                 textElement.textContent = selectedTarotCard;
                 
-                otherCard.style.opacity = '1'; // 恢復被選中牌的透明度
+                otherCard.style.opacity = '1'; 
             }
         });
     }
@@ -217,7 +214,6 @@ function generateFortune() {
     document.getElementById('selectedTarotName').textContent = selectedTarotCard;
     document.getElementById('fortuneOverallTitle').textContent = tarotReading.overall;
     
-    // 運勢細節的 HTML 結構
     resultDiv.innerHTML = `
         <div class="space-y-6">
             <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg">
@@ -278,7 +274,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // --- 占卜區塊事件 ---
-    // 星座卡片選擇邏輯 (已在 HTML 中使用 data-sign 連結到 JS)
     zodiacCards.forEach(card => {
         card.addEventListener('click', function() {
             zodiacCards.forEach(c => c.classList.remove('ring-4', 'ring-indigo-500'));
@@ -287,11 +282,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 占卜生成按鈕邏輯
     document.getElementById('generateFortune').addEventListener('click', generateFortune);
 
     // --- AI 聊天區塊事件 ---
-    // AI 聊天傳送按鈕邏輯
     sendMessageBtn.addEventListener('click', sendChatMessage);
     chatInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
@@ -311,8 +304,3 @@ document.addEventListener('DOMContentLoaded', function() {
     // 顯示初始訊息
     appendMessage(initialMessageText, 'system');
 });
-
-// 必須定義在全域，因為 HTML 的 onclick 屬性會呼叫它們
-// function handleCardFlip(card, index) { ... } (已定義在上方)
-// function generateFortune() { ... } (已定義在上方)
-
