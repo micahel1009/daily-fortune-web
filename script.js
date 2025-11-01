@@ -1,7 +1,7 @@
 let selectedZodiac = '';
 let selectedTarotCard = ''; // 格式為 '牌名_正位/逆位'
 
-// 占卜結果數據庫
+// 占卜結果數據庫 (保持不變)
 const zodiacFortunes = {
     '牡羊座': {
         love: '今日愛情能量強烈，單身者有機會遇到命中注定的人，有伴侶者感情更加甜蜜。',
@@ -77,7 +77,7 @@ const zodiacFortunes = {
     }
 };
 
-// 塔羅牌含義 (包含正逆位)
+// 塔羅牌含義 (保持不變)
 const tarotMeanings = {
     '太陽_正位': {
         love: '愛情充滿陽光和活力，正面能量讓關係更加和諧。',
@@ -118,56 +118,61 @@ const tarotMeanings = {
 };
 
 
-// 諮商師回應數據庫 (人性化溝通) - 已優化回應，讓回覆更貼近問題主題
+// 諮商師回應數據庫 (已新增一般問候和閒聊的回應)
 const counselorResponses = {
-    generalComfort: [
-        "我聽到了你的感受，這確實不容易。你願意告訴我更多嗎？或許說出來會讓心情好一些。",
-        "每個人都會有這樣的時刻，你並不孤單。我想更了解你現在的感受是什麼。",
-        "謝謝你願意與我分享這些。你的感受都是真實且重要的，請不用擔心。",
-        "我知道你已經很努力了，光是願意來這裡傾訴，你就已經很棒了。你現在最想聊聊的是什麼呢？",
-        "順從自己的心，我們一起慢慢理清思緒。你現在最想解決的是哪一部分？"
+    // 1. 問候語與基本對話 (高優先級)
+    greetingKeywords: ['你好', '嗨', '哈囉', '在嗎', '請問', '早安', '晚安', 'hello'],
+    greetingResponses: [
+        "你好！很高興你來找我。今天過得怎麼樣？",
+        "嗨，我在這裡，請說。你現在感覺還好嗎？",
+        "很高興見到你！有什麼想聊的，或是想分享今天的運勢嗎？",
+        "你好！無論是占卜結果還是生活中的煩惱，我都隨時準備好聆聽。",
+        "我在喔！請不用客氣，有什麼事情想跟我說呢？"
     ],
+    // 2. 閒聊回應 (中高優先級)
+    affirmativeKeywords: ['沒事', '還好', '沒說話', '沒問題', '謝謝你', '你真好', '你很棒'],
+    affirmativeResponses: [
+        "很高興聽到你說還好/沒事。如果只是想隨意聊聊，我也很樂意陪伴喔。",
+        "謝謝你的肯定！我的職責就是陪伴和支持你。你有特別想從哪裡開始聊起嗎？",
+        "嗯，這的確是個挑戰。很高興你願意和我分享，我在這裡支持你。",
+        "我聽到你的心聲了。請允許自己有這樣的感受，然後我們再一起想想看怎麼辦。",
+        "我明白。當你需要我的時候，隨時告訴我。不用著急，慢慢來。"
+    ],
+    // 3. 抱怨與傾訴 (中優先級，諮商引導式)
     careerKeywords: ['工作', '上班', '老闆', '同事', '壓力', '專案', '加班', '裁員', '業績', '職場'],
     careerResponses: [
         "聽起來工作上的壓力讓你感到很辛苦。你覺得這種壓力主要來自哪個方面呢？我們來看看有沒有可以調整的空間。",
         "處理複雜的職場關係確實讓人心力交瘁。你覺得最困難的部分是什麼？記住，你的價值不只是工作表現，你已經盡力了。",
-        "工作不順利的時候，挫折感是很正常的。關於這個狀況，你目前最希望得到什麼樣的幫助或建議呢？或許我們可以一起探索一些可能性。",
-        "面對職場上的挑戰，你真的很不容易。你覺得如果能改變一件事，會是什麼呢？"
+        "關於工作，你目前最希望得到什麼樣的幫助或建議呢？或許我們可以一起探索一些可能性。",
     ],
     loveKeywords: ['感情', '愛情', '分手', '伴侶', '朋友', '吵架', '孤單', '寂寞', '約會', '單身', '桃花', '人際'],
     loveResponses: [
         "感情的波折總是特別讓人難受。我很欣賞你願意面對這些。你現在最需要的，是有人聆聽，還是想找出下一步怎麼做？",
         "孤單的感受是很真實的，但請記得，感受是會流動的。關於你提到的這個狀況，你覺得什麼時候，這個孤單感會稍微減輕一點？",
         "人際關係中的摩擦在所難免。你覺得這次爭執，有沒有什麼是你很想表達，但還沒說出口的呢？",
-        "愛情的課題往往充滿挑戰，謝謝你願意分享。你覺得目前的狀況，最讓你感到困惑的是哪一點？"
     ],
     fortuneKeywords: ['不準', '騙人', '沒用', '亂說', '預測', '結果'],
     fortuneResponses: [
         "我很抱歉這次的占卜結果沒能給你帶來安慰。占卜是一種指引，但你永遠是自己人生的主人。你覺得今天發生的什麼事，讓你覺得結果不準確呢？我想聽聽你的故事。",
-        "沒關係，運勢只是一個參考。或許它提醒了我們需要關注一些被忽略的細節。你今天最困擾你的事情是什麼？我們來聊聊實質的困難吧！",
-        "謝謝你分享對占卜結果的看法。無論如何，最終的決定權都在你手中。你現在最想解決的是什麼具體問題呢？",
+        "沒關係，運勢只是一個參考。你今天最困擾你的事情是什麼？我們來聊聊實質的困難吧！",
         "占卜結果有時會與實際感受有所出入，這是很正常的。你覺得哪些部分與你的期待不符？我很樂意聽你說說。"
     ],
-    affirmativeResponses: [
-        "是的，我明白你的感受。這確實不容易，但請相信你會找到解決方法的。",
-        "你說的很有道理，我完全理解你的困境。光是表達出來，就已經很勇敢了。",
-        "我聽到你的心聲了。無論發生什麼，你都不是一個人面對。",
-        "嗯，這的確是個挑戰。很高興你願意和我分享，我在這裡支持你。",
-        "我感受到你的情緒了。請允許自己有這樣的感受，然後我們再一起想想看怎麼辦。"
+    // 4. 通用安慰 (最低優先級)
+    generalComfort: [
+        "我聽到了你的感受，這確實不容易。你願意告訴我更多嗎？或許說出來會讓心情好一些。",
+        "每個人都會有這樣的時刻，你並不孤單。我想更了解你現在的感受是什麼。",
+        "謝謝你願意與我分享這些。你的感受都是真實且重要的，請不用擔心。",
+        "如果雨季遲遲沒有結束，我會陪你一起淋雨。你覺得現在最需要的是什麼樣的支持呢？",
     ]
 };
 
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    // ***注意：已移除主題切換按鈕的相關邏輯***
-
     // --- 星座選擇事件 ---
     document.querySelectorAll('.zodiac-card').forEach(card => {
         card.addEventListener('click', function() {
-            // 移除所有卡片的選中樣式
             document.querySelectorAll('.zodiac-card').forEach(c => c.classList.remove('ring-4', 'ring-indigo-500', 'dark:ring-indigo-400'));
-            // 添加當前卡片的選中樣式
             this.classList.add('ring-4', 'ring-indigo-500', 'dark:ring-indigo-400');
             selectedZodiac = this.dataset.sign;
         });
@@ -197,13 +202,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// 塔羅牌翻轉邏輯 (包含正逆位判斷)
+// 塔羅牌翻轉邏輯 (保持不變)
 function flipCard(card) {
     const flipDiv = card.querySelector('.tarot-flip');
     const backDiv = card.querySelector('.tarot-back');
 
     if (!flipDiv.classList.contains('flipped')) {
-        // 檢查是否已抽取過牌
         if (document.querySelector('.tarot-flip.flipped')) {
              alert('今天只能抽一張牌喔！');
              return;
@@ -211,7 +215,6 @@ function flipCard(card) {
 
         flipDiv.classList.add('flipped');
 
-        // 定義牌組和正逆位
         const tarotNames = ['太陽', '月亮', '星星'];
         const icons = ['fas fa-sun', 'fas fa-moon', 'fas fa-star'];
         const colors = ['text-yellow-500', 'text-blue-500', 'text-purple-500'];
@@ -220,7 +223,6 @@ function flipCard(card) {
         const randomIndex = Math.floor(Math.random() * tarotNames.length);
         const randomOrientationIndex = Math.floor(Math.random() * orientations.length);
 
-        // 決定抽到的牌名 (e.g., '太陽_正位')
         const tarotName = tarotNames[randomIndex];
         const orientation = orientations[randomOrientationIndex];
         selectedTarotCard = tarotName + '_' + orientation;
@@ -229,10 +231,8 @@ function flipCard(card) {
         const textElement = backDiv.querySelector('p');
 
         iconElement.className = icons[randomIndex] + ' text-xl mb-1 ' + colors[randomIndex];
-        // 顯示牌名和正逆位
         textElement.innerHTML = `${tarotName}<br><span class="text-xs text-gray-500 dark:text-gray-400">${orientation}</span>`;
 
-        // 鎖定其他卡牌
         document.querySelectorAll('.tarot-card').forEach(otherCard => {
             if (otherCard !== card) {
                 otherCard.style.opacity = '0.5';
@@ -242,37 +242,34 @@ function flipCard(card) {
     }
 }
 
-// 運勢結果生成邏輯
+// 運勢結果生成邏輯 (保持不變)
 function generateFortune() {
     const zodiacReading = zodiacFortunes[selectedZodiac];
     const tarotReading = tarotMeanings[selectedTarotCard];
 
-    // 顯示選擇結果
     document.getElementById('selectedSign').textContent = selectedZodiac;
-    document.getElementById('selectedTarot').textContent = selectedTarotCard.replace('_', ' '); // 顯示 '太陽 正位'
+    document.getElementById('selectedTarot').textContent = selectedTarotCard.replace('_', ' ');
 
-    // 組合運勢
     document.getElementById('loveReading').textContent = combineReadings(zodiacReading.love, tarotReading.love);
     document.getElementById('careerReading').textContent = combineReadings(zodiacReading.career, tarotReading.career);
     document.getElementById('moneyReading').textContent = combineReadings(zodiacReading.money, tarotReading.money);
     document.getElementById('adviceReading').textContent = combineReadings(zodiacReading.advice, tarotReading.advice);
 
-    // 顯示結果區並滾動過去
     document.getElementById('fortuneResult').classList.remove('hidden');
     document.getElementById('fortuneResult').scrollIntoView({ behavior: 'smooth' });
 }
 
-// 簡單組合星座和塔羅的運勢解釋
 function combineReadings(zodiacText, tarotText) {
     return `【星座啟示】${zodiacText} 【塔羅指引】${tarotText}`;
 }
 
-// 聊天機器人發送訊息邏輯 (諮商模擬)
+
+// 聊天機器人發送訊息邏輯 (優化對話流程)
 function sendChatMessage() {
     const input = document.getElementById('chatInput');
     const message = input.value.trim();
 
-    if (!message) return;
+    if (!message) return; // 空訊息不發送
 
     const chatMessages = document.getElementById('chatMessages');
 
@@ -289,17 +286,28 @@ function sendChatMessage() {
     `;
     chatMessages.appendChild(userMessage);
     input.value = '';
-    chatMessages.scrollTop = chatMessages.scrollHeight; // 滾動到底部
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // 2. 機器人回覆邏輯 (模擬諮商師)
+    // 2. 機器人回覆邏輯 (優化優先級)
     setTimeout(() => {
         let botText = '';
         const lowerCaseMessage = message.toLowerCase();
-        
         let matched = false;
         
-        // 檢查特定關鍵詞回覆
-        if (counselorResponses.careerKeywords.some(keyword => lowerCaseMessage.includes(keyword))) {
+        // 優先級 A: 問候語 (回應「你好」, 「在嗎」等)
+        if (counselorResponses.greetingKeywords.some(keyword => lowerCaseMessage.includes(keyword))) {
+            botText = counselorResponses.greetingResponses[Math.floor(Math.random() * counselorResponses.greetingResponses.length)];
+            matched = true;
+        } 
+        
+        // 優先級 B: 肯定/閒聊 (回應「謝謝你」, 「沒說話」等)
+        else if (counselorResponses.affirmativeKeywords.some(keyword => lowerCaseMessage.includes(keyword))) {
+            botText = counselorResponses.affirmativeResponses[Math.floor(Math.random() * counselorResponses.affirmativeResponses.length)];
+            matched = true;
+        }
+
+        // 優先級 C: 抱怨/傾訴 (回應「工作壓力大」, 「感情不順」等)
+        else if (counselorResponses.careerKeywords.some(keyword => lowerCaseMessage.includes(keyword))) {
             botText = counselorResponses.careerResponses[Math.floor(Math.random() * counselorResponses.careerResponses.length)];
             matched = true;
         } 
@@ -312,14 +320,9 @@ function sendChatMessage() {
             matched = true;
         }
         
-        // 如果沒有匹配到特定關鍵詞，隨機選用通用安慰或肯定回覆
+        // 優先級 D: 通用安慰 (最低優先級)
         if (!matched) {
-            // 50% 機率是通用安慰，50% 機率是肯定回覆
-            if (Math.random() < 0.5) {
-                botText = counselorResponses.generalComfort[Math.floor(Math.random() * counselorResponses.generalComfort.length)];
-            } else {
-                botText = counselorResponses.affirmativeResponses[Math.floor(Math.random() * counselorResponses.affirmativeResponses.length)];
-            }
+            botText = counselorResponses.generalComfort[Math.floor(Math.random() * counselorResponses.generalComfort.length)];
         }
 
         // 3. 顯示機器人訊息
@@ -334,6 +337,6 @@ function sendChatMessage() {
             </div>
         `;
         chatMessages.appendChild(botResponse);
-        chatMessages.scrollTop = chatMessages.scrollHeight; // 再次滾動到底部
-    }, 1200); // 延遲 1.2 秒模擬思考時間
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, 1200);
 }
