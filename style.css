@@ -86,10 +86,10 @@ body {
     background: #555;
 }
 
-/* 深色模式下的滾動條 */
+/* 深色模式下的滾動條（保留樣式以防萬一，但邏輯已移除） */
 .dark ::-webkit-scrollbar-track {
-    background: #1f2937; /* dark:bg-slate-800 */
+    background: #1f2937; 
 }
 .dark ::-webkit-scrollbar-thumb {
-    background: #4b5563; /* dark:bg-gray-600 */
+    background: #4b5563; 
 }
