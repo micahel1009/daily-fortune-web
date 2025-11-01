@@ -1,3 +1,33 @@
+// =======================================================
+// === 禁用右鍵/複製功能，提高獲取原始碼的門檻 START ===
+// =======================================================
+
+// 1. 禁用右鍵菜單 (contextmenu)
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+});
+
+// 2. 禁用選擇/複製功能 (防止用戶拖曳選取文字)
+document.addEventListener('selectstart', function(e) {
+    e.preventDefault();
+});
+
+// 3. 禁用鍵盤上的 F12 (DevTools) 和 Ctrl+Shift+I/J/C (DevTools)
+document.addEventListener('keydown', function(e) {
+    // F12 key
+    if (e.key === 'F12') {
+        e.preventDefault();
+    }
+    // Ctrl+Shift+I, J, C (Windows/Linux) 或 Cmd+Option+I, J, C (Mac)
+    if ((e.ctrlKey || e.metaKey) && (e.shiftKey) && (e.key === 'I' || e.key === 'J' || e.key === 'C')) {
+        e.preventDefault();
+    }
+});
+
+// =====================================================
+// === 禁用右鍵/複製功能，提高獲取原始碼的門檻 END ===
+// =====================================================
+
 let selectedZodiac = '';
 let selectedTarotCard = ''; // 格式為 '牌名_正位/逆位'
 
@@ -118,7 +148,7 @@ const tarotMeanings = {
 };
 
 
-// 諮商師回應數據庫 (已新增一般問候和閒聊的回應)
+// 諮商師回應數據庫 (保持不變)
 const counselorResponses = {
     // 1. 問候語與基本對話 (高優先級)
     greetingKeywords: ['你好', '嗨', '哈囉', '在嗎', '請問', '早安', '晚安', 'hello'],
@@ -143,7 +173,7 @@ const counselorResponses = {
     careerResponses: [
         "聽起來工作上的壓力讓你感到很辛苦。你覺得這種壓力主要來自哪個方面呢？我們來看看有沒有可以調整的空間。",
         "處理複雜的職場關係確實讓人心力交瘁。你覺得最困難的部分是什麼？記住，你的價值不只是工作表現，你已經盡力了。",
-        "關於工作，你目前最希望得到什麼樣的幫助或建議呢？或許我們可以一起探索一些可能性。",
+        "工作不順利的時候，挫折感是很正常的。關於這個狀況，你目前最希望得到什麼樣的幫助或建議呢？或許我們可以一起探索一些可能性。",
     ],
     loveKeywords: ['感情', '愛情', '分手', '伴侶', '朋友', '吵架', '孤單', '寂寞', '約會', '單身', '桃花', '人際'],
     loveResponses: [
@@ -264,12 +294,12 @@ function combineReadings(zodiacText, tarotText) {
 }
 
 
-// 聊天機器人發送訊息邏輯 (優化對話流程)
+// 聊天機器人發送訊息邏輯 (保持不變)
 function sendChatMessage() {
     const input = document.getElementById('chatInput');
     const message = input.value.trim();
 
-    if (!message) return; // 空訊息不發送
+    if (!message) return;
 
     const chatMessages = document.getElementById('chatMessages');
 
@@ -294,19 +324,19 @@ function sendChatMessage() {
         const lowerCaseMessage = message.toLowerCase();
         let matched = false;
         
-        // 優先級 A: 問候語 (回應「你好」, 「在嗎」等)
+        // 優先級 A: 問候語
         if (counselorResponses.greetingKeywords.some(keyword => lowerCaseMessage.includes(keyword))) {
             botText = counselorResponses.greetingResponses[Math.floor(Math.random() * counselorResponses.greetingResponses.length)];
             matched = true;
         } 
         
-        // 優先級 B: 肯定/閒聊 (回應「謝謝你」, 「沒說話」等)
+        // 優先級 B: 肯定/閒聊
         else if (counselorResponses.affirmativeKeywords.some(keyword => lowerCaseMessage.includes(keyword))) {
             botText = counselorResponses.affirmativeResponses[Math.floor(Math.random() * counselorResponses.affirmativeResponses.length)];
             matched = true;
         }
 
-        // 優先級 C: 抱怨/傾訴 (回應「工作壓力大」, 「感情不順」等)
+        // 優先級 C: 抱怨/傾訴
         else if (counselorResponses.careerKeywords.some(keyword => lowerCaseMessage.includes(keyword))) {
             botText = counselorResponses.careerResponses[Math.floor(Math.random() * counselorResponses.careerResponses.length)];
             matched = true;
@@ -320,7 +350,7 @@ function sendChatMessage() {
             matched = true;
         }
         
-        // 優先級 D: 通用安慰 (最低優先級)
+        // 優先級 D: 通用安慰
         if (!matched) {
             botText = counselorResponses.generalComfort[Math.floor(Math.random() * counselorResponses.generalComfort.length)];
         }
