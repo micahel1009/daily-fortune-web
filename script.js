@@ -1,20 +1,16 @@
-// =======================================================
-// === 禁用右鍵/複製功能，提高獲取原始碼的門檻 START ===
-// =======================================================
 
-// 1. 禁用右鍵菜單 (contextmenu)
 document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
 });
 
-// 2. 禁用選擇/複製功能 (防止用戶拖曳選取文字)
+
 document.addEventListener('selectstart', function(e) {
     e.preventDefault();
 });
 
-// 3. 禁用鍵盤上的 F12 (DevTools) 和 Ctrl+Shift+I/J/C (DevTools)
+
 document.addEventListener('keydown', function(e) {
-    // F12 key
+    
     if (e.key === 'F12') {
         e.preventDefault();
     }
@@ -24,9 +20,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// =====================================================
-// === 禁用右鍵/複製功能，提高獲取原始碼的門檻 END ===
-// =====================================================
+
 
 let selectedZodiac = '';
 let selectedTarotCard = ''; // 格式為 '牌名_正位/逆位'
@@ -370,3 +364,4 @@ function sendChatMessage() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }, 1200);
 }
+
